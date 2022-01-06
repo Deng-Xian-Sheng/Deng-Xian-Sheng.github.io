@@ -10,10 +10,6 @@
 <script>
 export default {
   name: "App",
-  meta: {
-    // 页面标题title
-    title: "说说话-邓文怡.com",
-  },
   methods: {
     //打字机
     start() {
