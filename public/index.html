@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <link rel="icon" href="<%= BASE_URL %>favicon.png">
+    <!--雪花和冰封-->
+    <link rel="stylesheet" href="/css/XueAndBing.css">
+    <title>
+        <%= htmlWebpackPlugin.options.title %>
+    </title>
+</head>
+
+<body style="background-color: black;">
+    <noscript>
+      <strong>We're sorry but <%= htmlWebpackPlugin.options.title %> doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
+    </noscript>
+    <div id="app"></div>
+    <!-- built files will be auto injected -->
+    <!--雪花和冰封的元素标签-->
+    <div class="hp_special_experience">
+        <div class="hol_frames_cont">
+            <div class="frame fader frost show">
+                <div class="frame_sprite frame_left"></div>
+                <div class="frame_sprite frame_right"></div>
+                <div class="frame_sprite frame_top"></div>
+                <div class="frame_sprite frame_bottom"></div>
+            </div>
+            <div class="frame fader lights">
+                <div class="frame_sprite frame_left"></div>
+                <div class="frame_sprite frame_right"></div>
+                <div class="frame_sprite frame_top"></div>
+                <div class="frame_sprite frame_bottom"></div>
+            </div>
+            <div id="snow_container" class="fader snow show">
+                <div class="snow_slice snow_1">
+                    <div class="snow_drifter drift_1"></div>
+                </div>
+                <div class="snow_slice snow_2">
+                    <div class="snow_drifter drift_2"></div>
+                </div>
+                <div class="snow_slice snow_3">
+                    <div class="snow_drifter drift_3"></div>
+                </div>
+                <div class="snow_slice snow_4">
+                    <div class="snow_drifter drift_4"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--网易云外链播放器-->
+    <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width=330 height=86 src="//music.163.com/outchain/player?type=2&id=1898990940&auto=1&height=66"></iframe>
+</body>
+
+</html>
