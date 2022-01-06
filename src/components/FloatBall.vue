@@ -1,19 +1,69 @@
 <template>
-  <transition>
-    <div
-      ref="dragIcon"
-      class="dragIcon"
-      @touchstart.stop="handleTouchStart"
-      @touchmove.prevent.stop="handleTouchMove($event)"
-      @touchend.stop="handleTouchEnd"
-      :style="{left: left + 'px',top: top + 'px',width: itemWidth + 'px',height: itemHeight + 'px'}"
-      v-text="text"
-      v-if="isShow"
-    >{{text}}</div>
-  </transition>
+  <div>
+    <transition name="el-zoom-in-bottom">
+      <el-button
+        type="info"
+        ref="dragIcon"
+        style="position: fixed;"
+        :style="{left: left +'px',top: top - 45 + 'px',width: itemWidth + 'px',height: itemHeight + 'px'}"
+        v-show="show"
+        v-if="isShow"
+        icon="el-icon-chat-dot-round"
+        circle
+      ></el-button>
+    </transition>
+    <transition name="el-zoom-in-bottom">
+      <el-button
+        type="info"
+        ref="dragIcon"
+        style="position: fixed;"
+        :style="{left: left - 10 +'px',top: top + 45 + 'px',width: itemWidth + 'px',height: itemHeight + 'px'}"
+        v-show="show"
+        v-if="isShow"
+        icon="el-icon-info"
+        circle
+      ></el-button>
+    </transition>
+    <transition name="el-zoom-in-bottom">
+      <el-button
+        type="info"
+        ref="dragIcon"
+        style="position: fixed;"
+        :style="{left: left - 10 +'px',top: top + 90 + 'px',width: itemWidth + 'px',height: itemHeight + 'px'}"
+        v-show="show"
+        v-if="isShow"
+        icon="el-icon-milk-tea"
+        circle
+      ></el-button>
+    </transition>
+    <transition>
+      <el-popover
+        placement="left"
+        :title="tiShiMainTitle"
+        :width="tiShiMainWidth"
+        trigger="manual"
+        :content="tiShiMainContent"
+        v-model="tiShiMain"
+      >
+        <div
+          slot="reference"
+          @click="show = !show"
+          ref="dragIcon"
+          class="dragIcon"
+          @touchstart.stop="handleTouchStart"
+          @touchmove.prevent.stop="handleTouchMove($event)"
+          @touchend.stop="handleTouchEnd"
+          :style="{left: left + 'px',top: top + 'px',width: itemWidth + 'px',height: itemHeight + 'px'}"
+          v-text="text"
+          v-if="isShow"
+        >{{text}}</div>
+      </el-popover>
+    </transition>
+  </div>
 </template>
 
 <script>
+import Public from "@/components/Public";
 export default {
   props: {
     text: {
@@ -39,14 +89,28 @@ export default {
       currentTop: null,
       clientW: document.documentElement.clientWidth, //视口宽
       clientH: document.documentElement.clientHeight, //视口高
+      show: false,
+      tiShiMain: false,
+      tiShiMainTitle: "点我有惊喜！",
+      tiShiMainWidth: "50px",
+      tiShiMainContent: "",
     };
   },
   created() {
-    this.left = this.clientW - this.itemWidth - 30;
+    this.left = this.clientW - this.itemWidth - 50;
     this.top = this.clientH / 2 - this.itemHeight / 2;
   },
   mounted() {
     this.bindScrollEvent();
+    this.tiShiMainInterval = setInterval(() => {
+      if (Public.MusicTiShi == true) {
+        this.tiShiMain = true;
+        setTimeout(() => {
+          this.tiShiMain = false;
+          clearInterval(this.tiShiMainInterval);
+        }, 1500);
+      }
+    }, 1000);
   },
   beforeDestroy() {
     // 记得销毁一些全局的的事件
@@ -74,10 +138,10 @@ export default {
     },
     handleTouchEnd() {
       if (this.left < this.clientW / 2) {
-        this.left = 30; //不让贴边 所以设置30没设置0
+        this.left = 50; //不让贴边 所以设置30没设置0
         this.handleIconY();
       } else {
-        this.left = this.clientW - this.itemWidth - 30; //不让贴边 所以减30
+        this.left = this.clientW - this.itemWidth - 50; //不让贴边 所以减30
         this.handleIconY();
       }
       this.$refs.dragIcon.style.transition = "all .3s";
@@ -122,10 +186,13 @@ export default {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background-color: orange;
+  /* background-color: orange; */
+  background-image: url("/image/kafei.png") !important;
+  background-size: cover !important;
   line-height: 40px;
   text-align: center;
   color: #fff;
+  border: 1px solid #fff;
 }
 .v-enter {
   opacity: 1;
