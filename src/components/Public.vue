@@ -10,6 +10,7 @@
     }
     // 暴露出这些属性和方法
     export default {
+        name:'Public',
         daZiJiValue,
         MusicTiShi,
         _isMobile

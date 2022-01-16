@@ -2,6 +2,7 @@
   <div>
     <transition name="el-zoom-in-bottom">
       <el-button
+        @click="lianXiZuoZheClick"
         type="info"
         ref="dragIcon"
         style="position: fixed;"
@@ -14,6 +15,7 @@
     </transition>
     <transition name="el-zoom-in-bottom">
       <el-button
+        @click="guanYuBenZhanClick"
         type="info"
         ref="dragIcon"
         style="position: fixed;"
@@ -26,6 +28,7 @@
     </transition>
     <transition name="el-zoom-in-bottom">
       <el-button
+        @click="juanZhuClick"
         type="info"
         ref="dragIcon"
         style="position: fixed;"
@@ -51,8 +54,11 @@
           ref="dragIcon"
           class="dragIcon"
           @touchstart.stop="handleTouchStart"
+          @mousedown="handleTouchStart"
           @touchmove.prevent.stop="handleTouchMove($event)"
+          @mousemove="handleTouchMoveForMouse($event)"
           @touchend.stop="handleTouchEnd"
+          @mouseup="handleTouchEnd"
           :style="{left: left + 'px',top: top + 'px',width: itemWidth + 'px',height: itemHeight + 'px'}"
           v-text="text"
           v-if="isShow"
@@ -65,6 +71,7 @@
 <script>
 import Public from "@/components/Public";
 export default {
+  name: "FloatBall",
   props: {
     text: {
       type: String,
@@ -122,19 +129,34 @@ export default {
       this.$refs.dragIcon.style.transition = "none";
     },
     handleTouchMove(e) {
-      const clientX = e.targetTouches[0].clientX; //手指相对视口的x
-      const clientY = e.targetTouches[0].clientY; //手指相对视口的y
-      const isInScreen =
-        clientX <= this.clientW &&
-        clientX >= 0 &&
-        clientY <= this.clientH &&
-        clientY >= 0;
-      if (this.startToMove && e.targetTouches.length === 1) {
-        if (isInScreen) {
-          this.left = clientX - this.itemWidth / 2;
-          this.top = clientY - this.itemHeight / 2;
+        const clientX = e.targetTouches[0].clientX; //手指相对视口的x
+        const clientY = e.targetTouches[0].clientY; //手指相对视口的y
+        const isInScreen =
+          clientX <= this.clientW &&
+          clientX >= 0 &&
+          clientY <= this.clientH &&
+          clientY >= 0;
+        if (this.startToMove && e.targetTouches.length === 1) {
+          if (isInScreen) {
+            this.left = clientX - this.itemWidth / 2;
+            this.top = clientY - this.itemHeight / 2;
+          }
         }
-      }
+    },
+    handleTouchMoveForMouse(e) {
+        const clientX = e.clientX; //手指相对视口的x
+        const clientY = e.clientY; //手指相对视口的y
+        const isInScreen =
+          clientX <= this.clientW &&
+          clientX >= 0 &&
+          clientY <= this.clientH &&
+          clientY >= 0;
+        if (this.startToMove == true) {
+          if (isInScreen) {
+            this.left = clientX - this.itemWidth / 2;
+            this.top = clientY - this.itemHeight / 2;
+          }
+        }
     },
     handleTouchEnd() {
       if (this.left < this.clientW / 2) {
@@ -175,6 +197,15 @@ export default {
       if (this.scrollTop == this.currentTop) {
         this.isShow = true;
       }
+    },
+    lianXiZuoZheClick() {
+      this.$parent.lianXiZuoZheClick();
+    },
+    juanZhuClick() {
+      this.$parent.juanZhuClick();
+    },
+    guanYuBenZhanClick() {
+      this.$parent.guanYuBenZhanClick();
     },
   },
 };

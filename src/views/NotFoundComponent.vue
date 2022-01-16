@@ -23,15 +23,16 @@
   </div>
 </template>
 <script>
-import Public from '@/components/Public';
+import Public from "@/components/Public";
 export default {
+  name: "NotFoundComponent",
   data() {
     return {
       text: "是否跳转到首页？",
       fit: "contain",
       url: "/image/404.png",
       DialogVisible: false,
-      DialogVisibleWidth:"50%",
+      DialogVisibleWidth: "50%",
     };
   },
   methods: {
@@ -39,13 +40,13 @@ export default {
       this.$router.push({ path: "/" });
     },
   },
-  mounted(){
-      this.DialogVisible = true;
-      if (Public._isMobile()) {
+  mounted() {
+    if (Public._isMobile()) {
       // alert("手机端")
-      this.DialogVisibleWidth = "80%"
+      this.DialogVisibleWidth = "80%";
     }
-  }
+    this.DialogVisible = true;
+  },
 };
 </script>
 <style scoped>

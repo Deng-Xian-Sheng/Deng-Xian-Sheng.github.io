@@ -51,17 +51,31 @@ export default {
             background-size: cover;
             position: relative;
         } */
-
-.content {
-  height: 60%;
-  width: 60%;
-  background: white;
-  position: absolute;
-  left: 50%;
-  top: 40%;
-  margin-left: -30%;
-  margin-top: -16%;
-  border-radius: 4px;
+@media (min-width: 1300px) {
+  .content {
+    height: 60%;
+    width: 60%;
+    background: white;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    margin-left: -30%;
+    margin-top: -16%;
+    border-radius: 4px;
+  }
+}
+@media (max-width: 1300px) {
+  .content {
+    height: 60%;
+    width: 60%;
+    background: white;
+    position: absolute;
+    left: 50%;
+    top: 40%;
+    margin-left: -30%;
+    margin-top: -16%;
+    border-radius: 4px;
+  }
 }
 /* filter是对该元素的模糊，因此对content添加并模糊伪元素，并定位到content的下层，而不是直接修改背景图或content的样式 */
 
