@@ -174,7 +174,7 @@ export default {
         this.headerGunDongGuoDuClass = "headerGunDongGuoDu";
         this.headerStyleNumber = result;
       }
-      this.headerStyle = "top:" + this.headerStyleNumber + "px!important;";
+      this.headerStyle = "top:" + this.headerStyleNumber + "px;";
     },
     Exit() {
       this.neiTui = false;

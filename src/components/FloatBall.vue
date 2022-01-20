@@ -56,7 +56,6 @@
           @touchstart.stop="handleTouchStart"
           @mousedown="handleTouchStart"
           @touchmove.prevent.stop="handleTouchMove($event)"
-          @mousemove="handleTouchMoveForMouse($event)"
           @touchend.stop="handleTouchEnd"
           @mouseup="handleTouchEnd"
           :style="{left: left + 'px',top: top + 'px',width: itemWidth + 'px',height: itemHeight + 'px'}"
@@ -70,6 +69,7 @@
 
 <script>
 import Public from "@/components/Public";
+import $ from 'jquery'
 export default {
   name: "FloatBall",
   props: {
@@ -118,6 +118,7 @@ export default {
         }, 1500);
       }
     }, 1000);
+    $(window).mousemove(this.handleTouchMoveForMouse);
   },
   beforeDestroy() {
     // 记得销毁一些全局的的事件
@@ -159,6 +160,7 @@ export default {
         }
     },
     handleTouchEnd() {
+      this.startToMove = false
       if (this.left < this.clientW / 2) {
         this.left = 50; //不让贴边 所以设置30没设置0
         this.handleIconY();

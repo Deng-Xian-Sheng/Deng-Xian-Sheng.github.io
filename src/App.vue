@@ -21,21 +21,43 @@
       v-bind:class="NeteaseCloudPlayIframeClass"
       v-bind:style="NeteaseCloudPlayIframeStyle"
       @mousedown="NeteaseCloudPlayIframeMouseDownOrUp =  true"
+      @touchstart="NeteaseCloudPlayIframeMouseDownOrUp =  true"
       @mouseup="NeteaseCloudPlayIframeMouseDownOrUp = false"
-      @mousemove="NeteaseCloudPlayIframeExtendRunTime"
+      @touchend="NeteaseCloudPlayIframeMouseDownOrUp = false"
+      @touchmove.prevent.stop="NeteaseCloudPlayIframeForTouchClick($event)"
     >
-      <div v-bind:class="NeteaseCloudPlayIframeClassIcon">
-        <i class="el-icon-arrow-right"></i>
-      </div>
-      <iframe
-        frameborder="no"
-        border="0"
-        marginwidth="0"
-        marginheight="0"
-        width="330"
-        height="86"
-        src="//music.163.com/outchain/player?type=2&id=1898990940&auto=1&height=66"
-      ></iframe>
+      <el-row>
+        <el-col :span="NeteaseIconSpan">
+          <div
+            v-bind:class="NeteaseCloudPlayIframeClassIcon"
+            @mousedown="NeteaseShowClick"
+            @mouseup="NeteaseIconUp = true"
+          >
+            <el-row>
+              <el-col :pull="4" :span="1">
+                <i v-bind:class="NeteaseIconClass"></i>
+              </el-col>
+            </el-row>
+          </div>
+        </el-col>
+        <el-col :span="23">
+          <div
+            v-bind:style="NeteaseCloudPlayIframeDivStyle"
+            v-bind:class="NeteaseCloudPlayIframeDivClass"
+          >
+            <iframe
+              v-bind:style="NeteaseCloudPlayIframeIframeStyle"
+              frameborder="no"
+              border="0"
+              marginwidth="0"
+              marginheight="0"
+              width="280"
+              height="86"
+              src="//music.163.com/outchain/player?type=2&id=1898990940&auto=1&height=66"
+            ></iframe>
+          </div>
+        </el-col>
+      </el-row>
     </div>
     <!--雪花和冰封的元素标签-->
     <div class="hp_special_experience">
@@ -81,9 +103,22 @@ export default {
       MusicDialogVisible: false,
       MusicDialogVisibleWidth: "30%",
       NeteaseCloudPlayIframeClass: "NeteaseCloudPlayIframe",
-      NeteaseCloudPlayIframeStyle: "",
+      NeteaseCloudPlayIframeStyle: "left:60px;top:40%;",
       NeteaseCloudPlayIframeMouseDownOrUp: false,
       NeteaseCloudPlayIframeClassIcon: "NeteaseCloudPlayIframeIcon",
+      NeteaseCloudPlayIframeDivStyle: "left:-270px;",
+      NeteaseCloudPlayIframeWindowWidth: 0,
+      NeteaseIconSpan: 1,
+      NeteaseIconClass: "el-icon-arrow-left",
+      NeteaseCloudPlayIframeDivClass: "NeteaseCloudPlayIframeDiv",
+      NeteaseGPSLeftOrRight: true,
+      NeteaseGPSTop: 0,
+      NeteaseGPSLeft: 0,
+      NeteaseIfMove: false,
+      NeteaseIconUp: false,
+      NeteaseLockIframeIframeStyle: true,
+      NeteaseCloudPlayIframeIframeStyle:
+        "mask-image: -webkit-linear-gradient(left, rgba(0, 0, 0, 0) 100%, rgba(0, 0, 0, 1) 0%);",
     };
   },
   methods: {
@@ -110,29 +145,254 @@ export default {
         this.$router.push({ path: "/guanyubenzhan" });
       }
     },
-    NeteaseCloudPlayIframeMouseMove() {
-      return new Promise((resolve) => {
-        $(document).mousemove((event) => {
-          var e = event || window.event;
-          var x = e.pageX || e.clientX + document.body.scroolLeft;
-          var y = e.pageY || e.clientY + document.body.scrollTop;
-          resolve([x - 30, y - 45]);
-        });
-      });
-    },
-    async NeteaseCloudPlayIframeCompute() {
+    NeteaseCloudPlayIframeClick(event) {
+      var e = event || window.event;
+      var ValueX = e.pageX || e.clientX + document.body.scroolLeft;
+      var ValueY = e.pageY || e.clientY + document.body.scrollTop;
+      var x = ValueX - 10;
+      var y = ValueY - 45;
       if (this.NeteaseCloudPlayIframeMouseDownOrUp == true) {
-        var result = await this.NeteaseCloudPlayIframeMouseMove();
-        this.NeteaseCloudPlayIframeStyle =
-          "left:" + result[0] + "px;" + "top:" + result[1] + "px;";
+        if (this.NeteaseCloudPlayIframeClass != "NeteaseCloudPlayIframe") {
+          this.NeteaseCloudPlayIframeClass = "NeteaseCloudPlayIframe";
+        }
+        var HalfWindowWidth = this.NeteaseCloudPlayIframeWindowWidth / 2;
+        var ToCenterLong = ValueX - HalfWindowWidth;
+        if (ToCenterLong > 0) {
+          this.NeteaseCloudPlayIframeStyle =
+            "left:" + x + "px;" + "top:" + y + "px;";
+          this.NeteaseGPSLeft = x;
+          this.NeteaseGPSTop = y;
+          if (ToCenterLong < 270) {
+            if (this.NeteaseGPSLeftOrRight != false) {
+              this.NeteaseIconFlipClick();
+              this.NeteaseGPSLeftOrRight = false;
+              if (this.NeteaseLockIframeIframeStyle == false) {
+                this.NeteaseCloudPlayIframeDivClass =
+                  "NeteaseCloudPlayIframeDiv NeteaseCloudPlayIframeTransition";
+                this.NeteaseCloudPlayIframeDivStyle = "left:-270px;";
+              } else {
+                this.NeteaseCloudPlayIframeDivClass =
+                  "NeteaseCloudPlayIframeDiv";
+                this.NeteaseCloudPlayIframeDivStyle = "left:0px;";
+              }
+            }
+          }
+        } else {
+          this.NeteaseCloudPlayIframeStyle =
+            "left:" + x + "px;" + "top:" + y + "px;";
+          this.NeteaseGPSLeft = x;
+          this.NeteaseGPSTop = y;
+          if (HalfWindowWidth - ValueX < 270) {
+            if (this.NeteaseGPSLeftOrRight != true) {
+              this.NeteaseIconFlipClick();
+              this.NeteaseGPSLeftOrRight = true;
+              if (this.NeteaseLockIframeIframeStyle == false) {
+                this.NeteaseCloudPlayIframeDivClass =
+                  "NeteaseCloudPlayIframeDiv NeteaseCloudPlayIframeTransition";
+                this.NeteaseCloudPlayIframeDivStyle = "left:0px;";
+              } else {
+                this.NeteaseCloudPlayIframeDivClass =
+                  "NeteaseCloudPlayIframeDiv";
+                this.NeteaseCloudPlayIframeDivStyle = "left:-270px;";
+              }
+            }
+          }
+        }
+        this.NeteaseIfMove = true;
       }
     },
-    NeteaseCloudPlayIframeExtendRunTime(){
-      var ExtendRunTime = setInterval(this.NeteaseCloudPlayIframeCompute)
-      setTimeout(()=>{
-        clearInterval(ExtendRunTime)
-      },500)
-    }
+    NeteaseCloudPlayIframeForTouchClick(event) {
+      var ValueX = event.targetTouches[0].clientX;
+      var ValueY = event.targetTouches[0].clientY;
+      var x = ValueX - 10;
+      var y = ValueY - 45;
+      if (this.NeteaseCloudPlayIframeMouseDownOrUp == true) {
+        if (this.NeteaseCloudPlayIframeClass != "NeteaseCloudPlayIframe") {
+          this.NeteaseCloudPlayIframeClass = "NeteaseCloudPlayIframe";
+        }
+        var HalfWindowWidth = this.NeteaseCloudPlayIframeWindowWidth / 2;
+        var ToCenterLong = ValueX - HalfWindowWidth;
+        if (ToCenterLong > 0) {
+          this.NeteaseCloudPlayIframeStyle =
+            "left:" + x + "px;" + "top:" + y + "px;";
+          this.NeteaseGPSLeft = x;
+          this.NeteaseGPSTop = y;
+          if (ToCenterLong < 270) {
+            if (this.NeteaseGPSLeftOrRight != false) {
+              this.NeteaseIconFlipClick();
+              this.NeteaseGPSLeftOrRight = false;
+              if (this.NeteaseLockIframeIframeStyle == false) {
+                this.NeteaseCloudPlayIframeDivClass =
+                  "NeteaseCloudPlayIframeDiv NeteaseCloudPlayIframeTransition";
+                this.NeteaseCloudPlayIframeDivStyle = "left:-270px;";
+              } else {
+                this.NeteaseCloudPlayIframeDivClass =
+                  "NeteaseCloudPlayIframeDiv";
+                this.NeteaseCloudPlayIframeDivStyle = "left:0px;";
+              }
+            }
+          }
+        } else {
+          this.NeteaseCloudPlayIframeStyle =
+            "left:" + x + "px;" + "top:" + y + "px;";
+          this.NeteaseGPSLeft = x;
+          this.NeteaseGPSTop = y;
+          if (HalfWindowWidth - ValueX < 270) {
+            if (this.NeteaseGPSLeftOrRight != true) {
+              this.NeteaseIconFlipClick();
+              this.NeteaseGPSLeftOrRight = true;
+              if (this.NeteaseLockIframeIframeStyle == false) {
+                this.NeteaseCloudPlayIframeDivClass =
+                  "NeteaseCloudPlayIframeDiv NeteaseCloudPlayIframeTransition";
+                this.NeteaseCloudPlayIframeDivStyle = "left:0px;";
+              } else {
+                this.NeteaseCloudPlayIframeDivClass =
+                  "NeteaseCloudPlayIframeDiv";
+                this.NeteaseCloudPlayIframeDivStyle = "left:-270px;";
+              }
+            }
+          }
+        }
+        this.NeteaseIfMove = true;
+      }
+    },
+    NeteaseCloudPlayIframeWindowWidthClick() {
+      this.NeteaseCloudPlayIframeWindowWidth = $(window).width();
+    },
+    NeteaseIconFlipClick() {
+      if (this.NeteaseIconClass == "el-icon-arrow-left") {
+        this.NeteaseIconClass = "el-icon-arrow-right";
+      } else {
+        this.NeteaseIconClass = "el-icon-arrow-left";
+      }
+    },
+    NeteaseHelpToEdge() {
+      if (this.NeteaseCloudPlayIframeMouseDownOrUp == false) {
+        if (this.NeteaseIfMove == true) {
+          if (
+            this.NeteaseCloudPlayIframeClass !=
+            "NeteaseCloudPlayIframe NeteaseCloudPlayIframeTransition"
+          ) {
+            this.NeteaseCloudPlayIframeClass =
+              "NeteaseCloudPlayIframe NeteaseCloudPlayIframeTransition";
+          }
+          if (this.NeteaseGPSLeftOrRight == true) {
+            this.NeteaseCloudPlayIframeStyle =
+              "left:" + 60 + "px;" + "top:" + this.NeteaseGPSTop + "px;";
+          } else {
+            this.NeteaseCloudPlayIframeStyle =
+              "left:" +
+              (this.NeteaseCloudPlayIframeWindowWidth - 80) +
+              "px;" +
+              "top:" +
+              this.NeteaseGPSTop +
+              "px;";
+          }
+        }
+      }
+    },
+    NeteaseShowClick() {
+      this.NeteaseIconUp = false;
+      setTimeout(() => {
+        if (this.NeteaseIconUp == true) {
+          this.NeteaseCloudPlayIframeDivClass =
+            "NeteaseCloudPlayIframeDiv NeteaseCloudPlayIframeDivTransition";
+          let i;
+          let x;
+          let Show;
+          let NotShow;
+          if (this.NeteaseGPSLeftOrRight == true) {
+            if (this.NeteaseCloudPlayIframeDivStyle != "left:-270px;") {
+              this.NeteaseIconFlipClick();
+              this.NeteaseLockIframeIframeStyle = true;
+              this.NeteaseCloudPlayIframeDivStyle = "left:-270px;";
+              i = 0;
+              NotShow = setInterval(() => {
+                i++;
+                x = i + 20;
+                if (i == 100) {
+                  x = 100;
+                }
+                this.NeteaseCloudPlayIframeIframeStyle =
+                  "mask-image: -webkit-linear-gradient(left, rgba(0, 0, 0, 0) " +
+                  i +
+                  "%, rgba(0, 0, 0, 1) " +
+                  x +
+                  "%);";
+                if (i == 100) {
+                  clearInterval(NotShow);
+                }
+              }, 10);
+            } else {
+              this.NeteaseIconFlipClick();
+              this.NeteaseLockIframeIframeStyle = false;
+              this.NeteaseCloudPlayIframeDivStyle = "left:0px;";
+              i = 100;
+              Show = setInterval(() => {
+                i--;
+                x = i + 20;
+                if (i == 0) {
+                  x = 0;
+                }
+                this.NeteaseCloudPlayIframeIframeStyle =
+                  "mask-image: -webkit-linear-gradient(left, rgba(0, 0, 0, 0) " +
+                  i +
+                  "%, rgba(0, 0, 0, 1) " +
+                  x +
+                  "%);";
+                if (i == 0) {
+                  clearInterval(Show);
+                }
+              }, 10);
+            }
+          } else {
+            if (this.NeteaseCloudPlayIframeDivStyle != "left:0px;") {
+              this.NeteaseIconFlipClick();
+              this.NeteaseLockIframeIframeStyle = true;
+              this.NeteaseCloudPlayIframeDivStyle = "left:0px;";
+              i = 0;
+              NotShow = setInterval(() => {
+                i++;
+                x = i + 20;
+                if (i == 100) {
+                  x = 100;
+                }
+                this.NeteaseCloudPlayIframeIframeStyle =
+                  "mask-image: -webkit-linear-gradient(right, rgba(0, 0, 0, 0) " +
+                  i +
+                  "%, rgba(0, 0, 0, 1) " +
+                  x +
+                  "%);";
+                if (i == 100) {
+                  clearInterval(NotShow);
+                }
+              }, 10);
+            } else {
+              this.NeteaseIconFlipClick();
+              this.NeteaseLockIframeIframeStyle = false;
+              this.NeteaseCloudPlayIframeDivStyle = "left:-270px;";
+              i = 100;
+              Show = setInterval(() => {
+                i--;
+                x = i + 20;
+                if (i == 0) {
+                  x = 0;
+                }
+                this.NeteaseCloudPlayIframeIframeStyle =
+                  "mask-image: -webkit-linear-gradient(right, rgba(0, 0, 0, 0) " +
+                  i +
+                  "%, rgba(0, 0, 0, 1) " +
+                  x +
+                  "%);";
+                if (i == 0) {
+                  clearInterval(Show);
+                }
+              }, 10);
+            }
+          }
+        }
+      }, 200);
+    },
   },
   mounted() {
     if (this.$route.name != "404") {
@@ -141,29 +401,44 @@ export default {
     if (Public._isMobile()) {
       // alert("手机端")
       this.MusicDialogVisibleWidth = "80%";
+      this.NeteaseCloudPlayIframeStyle = "left:60px;top:60%;";
     }
+    $(() => {
+      $(window).mousemove(this.NeteaseCloudPlayIframeClick);
+      this.NeteaseCloudPlayIframeWindowWidthClick();
+      $(window).resize(this.NeteaseCloudPlayIframeWindowWidthClick);
+      $(window).mouseup(this.NeteaseHelpToEdge);
+      $(window).on("touchend", this.NeteaseHelpToEdge);
+    });
   },
 };
 </script>
 <style scoped>
 .NeteaseCloudPlayIframe {
-  z-index: 9999;
   position: fixed;
-  background-color: lightcoral;
-  transition: all 300ms ease;
 }
 .NeteaseCloudPlayIframeIcon {
-  top:10px;
+  user-select: none;
+  top: 10px;
   position: absolute;
   height: 66px;
   width: 18px;
-  background-color: #DCDFE6;
+  background-color: #dcdfe6;
+  z-index: 1;
 }
-.NeteaseCloudPlayIframeIcon i{
-  position:absolute;
-  top:22px;
+.NeteaseCloudPlayIframeDiv {
+  position: relative;
+}
+.NeteaseCloudPlayIframeIcon i {
+  position: absolute;
+  top: 22px;
   font-size: 25px;
-  right: 0.01px;
   color: #606266;
+}
+.NeteaseCloudPlayIframeTransition {
+  transition: all 1s ease;
+}
+.NeteaseCloudPlayIframeDivTransition {
+  transition: all 1s linear;
 }
 </style>
