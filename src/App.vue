@@ -60,36 +60,38 @@
       </el-row>
     </div>
     <!--雪花和冰封的元素标签-->
-    <div class="hp_special_experience">
-      <div class="hol_frames_cont">
-        <div class="frame fader frost show">
-          <div class="frame_sprite frame_left"></div>
-          <div class="frame_sprite frame_right"></div>
-          <div class="frame_sprite frame_top"></div>
-          <div class="frame_sprite frame_bottom"></div>
-        </div>
-        <div class="frame fader lights">
-          <div class="frame_sprite frame_left"></div>
-          <div class="frame_sprite frame_right"></div>
-          <div class="frame_sprite frame_top"></div>
-          <div class="frame_sprite frame_bottom"></div>
-        </div>
-        <div id="snow_container" class="fader snow show">
-          <div class="snow_slice snow_1">
-            <div class="snow_drifter drift_1"></div>
+    <transition name="el-fade-in-linear">
+      <div v-if="showXueAndBing" class="hp_special_experience">
+        <div class="hol_frames_cont">
+          <div class="frame fader frost show">
+            <div class="frame_sprite frame_left"></div>
+            <div class="frame_sprite frame_right"></div>
+            <div class="frame_sprite frame_top"></div>
+            <div class="frame_sprite frame_bottom"></div>
           </div>
-          <div class="snow_slice snow_2">
-            <div class="snow_drifter drift_2"></div>
+          <div class="frame fader lights">
+            <div class="frame_sprite frame_left"></div>
+            <div class="frame_sprite frame_right"></div>
+            <div class="frame_sprite frame_top"></div>
+            <div class="frame_sprite frame_bottom"></div>
           </div>
-          <div class="snow_slice snow_3">
-            <div class="snow_drifter drift_3"></div>
-          </div>
-          <div class="snow_slice snow_4">
-            <div class="snow_drifter drift_4"></div>
+          <div id="snow_container" class="fader snow show">
+            <div class="snow_slice snow_1">
+              <div class="snow_drifter drift_1"></div>
+            </div>
+            <div class="snow_slice snow_2">
+              <div class="snow_drifter drift_2"></div>
+            </div>
+            <div class="snow_slice snow_3">
+              <div class="snow_drifter drift_3"></div>
+            </div>
+            <div class="snow_slice snow_4">
+              <div class="snow_drifter drift_4"></div>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </transition>
   </div>
 </template>
 
@@ -119,6 +121,7 @@ export default {
       NeteaseLockIframeIframeStyle: true,
       NeteaseCloudPlayIframeIframeStyle:
         "mask-image: -webkit-linear-gradient(left, rgba(0, 0, 0, 0) 100%, rgba(0, 0, 0, 1) 0%);",
+      showXueAndBing: true,
     };
   },
   methods: {
@@ -393,6 +396,9 @@ export default {
         }
       }, 200);
     },
+    showXueAndBingClick(newValue) {
+      this.showXueAndBing = newValue;
+    },
   },
   mounted() {
     if (this.$route.name != "404") {
@@ -416,6 +422,7 @@ export default {
 <style scoped>
 .NeteaseCloudPlayIframe {
   position: fixed;
+  width: 0;
 }
 .NeteaseCloudPlayIframeIcon {
   user-select: none;

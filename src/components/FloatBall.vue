@@ -1,6 +1,16 @@
 <template>
   <div>
     <transition name="el-zoom-in-bottom">
+      <mt-switch
+        v-model="showXueAndBing"
+        ref="dragIcon"
+        style="position: fixed;"
+        :style="{left: left -5+'px',top: top - 90 + 'px',width: itemWidth +4+'px',height: itemHeight+2 + 'px'}"
+        v-show="show"
+        v-if="isShow"
+      ></mt-switch>
+    </transition>
+    <transition name="el-zoom-in-bottom">
       <el-button
         @click="lianXiZuoZheClick"
         type="info"
@@ -69,7 +79,7 @@
 
 <script>
 import Public from "@/components/Public";
-import $ from 'jquery'
+import $ from "jquery";
 export default {
   name: "FloatBall",
   props: {
@@ -84,6 +94,11 @@ export default {
     itemHeight: {
       type: Number,
       default: 40,
+    },
+  },
+  watch: {
+    showXueAndBing(newValue) {
+      this.$parent.showXueAndBingClick(newValue);
     },
   },
   data() {
@@ -101,6 +116,7 @@ export default {
       tiShiMainTitle: "点我有惊喜！",
       tiShiMainWidth: "50px",
       tiShiMainContent: "",
+      showXueAndBing: true,
     };
   },
   created() {
@@ -130,37 +146,37 @@ export default {
       this.$refs.dragIcon.style.transition = "none";
     },
     handleTouchMove(e) {
-        const clientX = e.targetTouches[0].clientX; //手指相对视口的x
-        const clientY = e.targetTouches[0].clientY; //手指相对视口的y
-        const isInScreen =
-          clientX <= this.clientW &&
-          clientX >= 0 &&
-          clientY <= this.clientH &&
-          clientY >= 0;
-        if (this.startToMove && e.targetTouches.length === 1) {
-          if (isInScreen) {
-            this.left = clientX - this.itemWidth / 2;
-            this.top = clientY - this.itemHeight / 2;
-          }
+      const clientX = e.targetTouches[0].clientX; //手指相对视口的x
+      const clientY = e.targetTouches[0].clientY; //手指相对视口的y
+      const isInScreen =
+        clientX <= this.clientW &&
+        clientX >= 0 &&
+        clientY <= this.clientH &&
+        clientY >= 0;
+      if (this.startToMove && e.targetTouches.length === 1) {
+        if (isInScreen) {
+          this.left = clientX - this.itemWidth / 2;
+          this.top = clientY - this.itemHeight / 2;
         }
+      }
     },
     handleTouchMoveForMouse(e) {
-        const clientX = e.clientX; //手指相对视口的x
-        const clientY = e.clientY; //手指相对视口的y
-        const isInScreen =
-          clientX <= this.clientW &&
-          clientX >= 0 &&
-          clientY <= this.clientH &&
-          clientY >= 0;
-        if (this.startToMove == true) {
-          if (isInScreen) {
-            this.left = clientX - this.itemWidth / 2;
-            this.top = clientY - this.itemHeight / 2;
-          }
+      const clientX = e.clientX; //手指相对视口的x
+      const clientY = e.clientY; //手指相对视口的y
+      const isInScreen =
+        clientX <= this.clientW &&
+        clientX >= 0 &&
+        clientY <= this.clientH &&
+        clientY >= 0;
+      if (this.startToMove == true) {
+        if (isInScreen) {
+          this.left = clientX - this.itemWidth / 2;
+          this.top = clientY - this.itemHeight / 2;
         }
+      }
     },
     handleTouchEnd() {
-      this.startToMove = false
+      this.startToMove = false;
       if (this.left < this.clientW / 2) {
         this.left = 50; //不让贴边 所以设置30没设置0
         this.handleIconY();

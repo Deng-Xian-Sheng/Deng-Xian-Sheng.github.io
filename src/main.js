@@ -13,6 +13,7 @@ import Clipboard from 'clipboard'
 import PDF from 'vue-pdf'
 //雪花和冰封
 import "../public/css/XueAndBing.css"
+import axios from 'axios'
 
 Vue.component('FloatBall', FloatBall);
 Vue.component('PDF', PDF);
@@ -24,6 +25,7 @@ Vue.use(mavonEditor)
 
 Vue.prototype.Clipboard = Clipboard
 Vue.prototype.PDF = PDF
+Vue.prototype.axios = axios
 
 Vue.config.productionTip = false
 
