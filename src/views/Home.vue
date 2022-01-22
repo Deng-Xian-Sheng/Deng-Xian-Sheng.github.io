@@ -1,20 +1,67 @@
 <template>
   <div>
     <div class="box" v-bind:style="boxStyle">
+      <el-tooltip
+        v-model="changeBackgroundExceed"
+        :manual="true"
+        effect="dark"
+        placement="bottom-start"
+      >
+        <div slot="content">
+          {{changeBackgroundExceedTextUp}}
+          <br />
+          {{changeBackgroundExceedTextDown}}
+        </div>
+        <el-button
+          @click="changeBackgroundClick"
+          v-show="changeBackgroundButtonIPhoneOrNot== false"
+          class="el-icon-refresh changeBackgroundButton"
+          size="mini"
+          type="primary"
+          plain
+        >不好看，换一张？</el-button>
+      </el-tooltip>
+      <el-tooltip
+        v-model="changeBackgroundExceedIPhone"
+        :manual="true"
+        effect="dark"
+        placement="bottom-end"
+      >
+        <div slot="content">
+          {{changeBackgroundExceedTextUp}}
+          <br />
+          {{changeBackgroundExceedTextDown}}
+        </div>
+        <el-button
+          @click="changeBackgroundClick"
+          v-show="changeBackgroundButtonIPhoneOrNot==true"
+          class="changeBackgroundButtonIPhone"
+          type="primary"
+          circle
+        >
+          <i class="el-icon-refresh"></i>
+        </el-button>
+      </el-tooltip>
       <el-button
-        @click="changeBackgroundClick"
-        class="el-icon-refresh changeBackgroundButton"
-        size="mini"
-        type="primary"
-        plain
-      >不好看，换一张？</el-button>
-      <div
-        @dblclick="onOrOffVisionForContent=!onOrOffVisionForContent"
-        v-show="onOrOffVisionForContent == false"
-        v-bind:class="contentClass"
-        v-bind:style="contentStyle"
-        id="contents"
-      ></div>
+        @click="onOrOffVisionForContent=false;OffVisionForContentButtonShow=false"
+        v-show="OffVisionForContentButtonShow"
+        type="info"
+        class="OffVisionForContent"
+        circle
+      >
+        <i class="el-icon-view"></i>
+      </el-button>
+      <transition name="el-fade-in-linear">
+        <div
+          @dblclick="onOrOffVisionForContent=true;OffVisionForContentButtonShow=true"
+          v-show="onOrOffVisionForContent == false"
+          v-bind:class="contentClass"
+          v-bind:style="contentStyle"
+        >
+          <div id="contents"></div>
+          <span>双击隐藏</span>
+        </div>
+      </transition>
     </div>
   </div>
 </template>
@@ -32,7 +79,13 @@ export default {
       bingImgUrl: "",
       changeBackgroundCount: 0,
       getBingImgComputeInterval: null,
-      onOrOffVisionForContent:false
+      onOrOffVisionForContent: false,
+      OffVisionForContentButtonShow: false,
+      changeBackgroundExceed: false,
+      changeBackgroundExceedTextUp: "小姐姐/小哥哥，",
+      changeBackgroundExceedTextDown: "还没找到喜欢的嘛？",
+      changeBackgroundButtonIPhoneOrNot: false,
+      changeBackgroundExceedIPhone: false,
     };
   },
   methods: {
@@ -97,7 +150,17 @@ export default {
       clearInterval(this.getBingImgComputeInterval); //重置自动换背景图的定时器，防止手动换图后短时间内又被更换
       this.getBingImgComputeIntervalClick();
       if (this.changeBackgroundCount > 5) {
-        alert("小姐姐，还找不到喜欢的嘛？");
+        if (Public._isMobile()) {
+          this.changeBackgroundExceedIPhone = true;
+          setTimeout(() => {
+            this.changeBackgroundExceedIPhone = false;
+          }, 5000);
+        } else {
+          this.changeBackgroundExceed = true;
+          setTimeout(() => {
+            this.changeBackgroundExceed = false;
+          }, 5000);
+        }
         this.changeBackgroundCount = 0;
       }
     },
@@ -107,6 +170,7 @@ export default {
     if (Public._isMobile()) {
       // alert("手机端")
       this.contentClass = "contentiPhone";
+      this.changeBackgroundButtonIPhoneOrNot = true;
     }
     this.getBingImgCompute();
     this.getBingImgComputeIntervalClick();
@@ -164,6 +228,12 @@ body {
   }
 }
 /* filter是对该元素的模糊，因此对content添加并模糊伪元素，并定位到content的下层，而不是直接修改背景图或content的样式 */
+.content span {
+  position: absolute;
+  top: 0px;
+  font-size: 12px;
+  color: #606266;
+}
 
 .content::before {
   content: "";
@@ -183,7 +253,7 @@ body {
 
 .content p {
   padding: 20px 15px;
-  color: black;
+  color: #303133;
   text-indent: 20px;
   font-size: 14px;
   line-height: 28px;
@@ -224,7 +294,7 @@ body {
 
 .contentiPhone p {
   padding: 20px 15px;
-  color: black;
+  color: #303133;
   text-indent: 20px;
   font-size: 14px;
   line-height: 28px;
@@ -232,12 +302,45 @@ body {
   /* 清除子元素对父元素filter属性值的继承 */
   filter: blur(0);
 }
+.contentiPhone span {
+  position: absolute;
+  top: 0px;
+  font-size: 12px;
+  color: #606266;
+}
 /*手机页面打字机css结束*/
 .changeBackgroundButton {
-  position: relative;
-  float: right;
+  position: absolute;
   top: 50px;
   right: 50px;
 }
+.changeBackgroundButtonIPhone {
+  position: absolute;
+  top: -24px;
+  left: -30px;
+  z-index: 3;
+  height: 60px;
+  width: 60px;
+}
+.changeBackgroundButtonIPhone i {
+  position: relative;
+  font-size: 30px;
+  right: -10px;
+  bottom: -10px;
+}
+.OffVisionForContent {
+  position: absolute;
+  top: -25px;
+  right: -16px;
+  z-index: 3;
+  height: 60px;
+  width: 60px;
+}
+.OffVisionForContent i {
+  position: relative;
+  font-size: 30px;
+  left: -10px;
+  bottom: -10px;
+}
 </style>
-<!--修改换一换超过提示，全局禁止滚动处理，背景图加载动画（非手动更换背景不要加载动画），背景图更换动画，换一换按钮手机端适配处理，图片描述，中央文字块隐藏问题，下载本图片-->
+<!--全局禁止滚动处理，背景图加载动画（非手动更换背景不要加载动画），背景图更换动画，图片描述，下载本图片-->

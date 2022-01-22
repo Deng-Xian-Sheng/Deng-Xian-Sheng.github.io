@@ -1,7 +1,7 @@
 <template>
   <div>
     <router-view class="view boss"></router-view>
-    <FloatBall :text="''"></FloatBall>
+    <FloatBall ref="floatBall" :text="''"></FloatBall>
     <router-view ref="popupFloatBall" class="view popupFloatBall" name="popupFloatBall"></router-view>
     <el-dialog
       title="注意⚠️"
@@ -127,11 +127,13 @@ export default {
   methods: {
     MusicDialogVisibleStart() {
       Public.daZiJiValue = false;
-      Public.MusicTiShi = false;
     },
     MusicDialogVisibleEnd() {
       Public.daZiJiValue = true;
-      Public.MusicTiShi = true;
+      this.setupToNeteaseShow();
+      setTimeout(() => {
+        this.$refs.floatBall.tiShiMainShow();
+      }, 3000);
     },
     lianXiZuoZheClick() {
       if (this.$route.path != "/lianxizuozhe") {
@@ -398,6 +400,18 @@ export default {
     },
     showXueAndBingClick(newValue) {
       this.showXueAndBing = newValue;
+    },
+    setupToNeteaseShow() {
+      this.NeteaseShowClick();
+      setTimeout(() => {
+        this.NeteaseIconUp = true;
+      }, 100);
+      setTimeout(() => {
+        this.NeteaseShowClick();
+        setTimeout(() => {
+          this.NeteaseIconUp = true;
+        }, 100);
+      }, 3000);
     },
   },
   mounted() {

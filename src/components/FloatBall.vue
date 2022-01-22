@@ -50,16 +50,14 @@
       ></el-button>
     </transition>
     <transition>
-      <el-popover
-        placement="left"
-        :title="tiShiMainTitle"
-        :width="tiShiMainWidth"
-        trigger="manual"
-        :content="tiShiMainContent"
+      <el-tooltip
         v-model="tiShiMain"
+        :manual="true"
+        effect="dark"
+        :content="tiShiMainContent"
+        placement="left-end"
       >
         <div
-          slot="reference"
           @click="show = !show"
           ref="dragIcon"
           class="dragIcon"
@@ -72,13 +70,12 @@
           v-text="text"
           v-if="isShow"
         >{{text}}</div>
-      </el-popover>
+      </el-tooltip>
     </transition>
   </div>
 </template>
 
 <script>
-import Public from "@/components/Public";
 import $ from "jquery";
 export default {
   name: "FloatBall",
@@ -113,9 +110,7 @@ export default {
       clientH: document.documentElement.clientHeight, //视口高
       show: false,
       tiShiMain: false,
-      tiShiMainTitle: "点我有惊喜！",
-      tiShiMainWidth: "50px",
-      tiShiMainContent: "",
+      tiShiMainContent: "点我有惊喜！",
       showXueAndBing: true,
     };
   },
@@ -125,15 +120,6 @@ export default {
   },
   mounted() {
     this.bindScrollEvent();
-    this.tiShiMainInterval = setInterval(() => {
-      if (Public.MusicTiShi == true) {
-        this.tiShiMain = true;
-        setTimeout(() => {
-          this.tiShiMain = false;
-          clearInterval(this.tiShiMainInterval);
-        }, 1500);
-      }
-    }, 1000);
     $(window).mousemove(this.handleTouchMoveForMouse);
   },
   beforeDestroy() {
@@ -224,6 +210,12 @@ export default {
     },
     guanYuBenZhanClick() {
       this.$parent.guanYuBenZhanClick();
+    },
+    tiShiMainShow() {
+      this.tiShiMain = true;
+      setTimeout(() => {
+        this.tiShiMain = false;
+      }, 3000);
     },
   },
 };
