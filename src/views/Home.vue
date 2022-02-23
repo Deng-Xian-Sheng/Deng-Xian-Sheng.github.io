@@ -1,6 +1,12 @@
 <template>
   <div>
-    <div class="box" v-bind:style="boxStyle">
+    <div class="box" v-bind:style="boxStyle" v-loading.fullscreen.lock="fullscreenLoading">
+      <el-collapse-transition>
+        <div  v-show="BackgroundImgOneDiv" v-bind:style="BackgroundImgOneDivStyle" class="box BackgroundImgDivClass"></div>
+      </el-collapse-transition>
+        <el-collapse-transition>
+        <div v-show="BackgroundImgTwoDiv" v-bind:style="BackgroundImgTwoDivStyle" class="box BackgroundImgDivClass"></div>
+        </el-collapse-transition>
       <el-tooltip
         v-model="changeBackgroundExceed"
         :manual="true"
@@ -51,6 +57,19 @@
       >
         <i class="el-icon-view"></i>
       </el-button>
+      <div class="BackgroundImgDescription" v-if="BackgroundImgDescriptionShow">
+        <span>
+          {{BackgroundImgDescriptionContent}}
+          <a
+            v-bind:href="bingImgUrl"
+            download="BackgroundImg"
+            target="_blank"
+          >
+            下载本图片
+            <i class="el-icon-download"></i>
+          </a>
+        </span>
+      </div>
       <transition name="el-fade-in-linear">
         <div
           @dblclick="onOrOffVisionForContent=true;OffVisionForContentButtonShow=true"
@@ -86,6 +105,13 @@ export default {
       changeBackgroundExceedTextDown: "还没找到喜欢的嘛？",
       changeBackgroundButtonIPhoneOrNot: false,
       changeBackgroundExceedIPhone: false,
+      BackgroundImgDescriptionContent: "",
+      BackgroundImgDescriptionShow: true,
+      BackgroundImgOneDivStyle: "",
+      BackgroundImgTwoDivStyle: "",
+      BackgroundImgOneDiv: true,
+      BackgroundImgTwoDiv: true,
+      fullscreenLoading:false,
     };
   },
   methods: {
@@ -111,9 +137,21 @@ export default {
     getBingImg() {
       return new Promise((resolve) => {
         this.axios
-          .get("http://bing.getlove.cn/latelyBingImageStory")
+          .get("//bing.uosblog.top")
           .then((response) => {
-            resolve(response);
+            if (response.status == 200) {
+              var num = Math.floor(Math.random() * response.data.images.length);
+              var img = new Image();
+              img.onload = () => {
+                resolve([num, response]);
+              };
+              img.onerror = () => {
+                console.error(img, "图片预加载错误");
+              };
+              img.src = response.data.images[num].url;
+            } else {
+              console.error(response);
+            }
           })
           .catch((error) => {
             // 请求失败处理
@@ -121,31 +159,35 @@ export default {
           });
       });
     },
-    async getBingImgCompute() {
-      var out = await this.getBingImg();
-      if (out.status == 200) {
-        this.bingImgUrl =
-          out.data[Math.floor(Math.random() * out.data.length)].CDNUrl;
-        this.boxStyle =
-          "height:" +
-          $(window).height() +
-          "px;width:" +
-          $(window).width() +
-          "px;background-image:url('" +
-          this.bingImgUrl +
-          "');";
-        this.contentStyle = "--bingImgUrl:url('" + this.bingImgUrl + "');";
-      } else {
-        console.error(out);
+    async getBingImgCompute(Type) {
+      if (Type != "auto"){
+        this.fullscreenLoading = true
+        var out = await this.getBingImg();
+        this.fullscreenLoading = false
+      }else{
+        out = await this.getBingImg();
       }
+      this.bingImgUrl = out[1].data.images[out[0]].url;
+      this.BackgroundImgDescriptionContent =
+        out[1].data.images[out[0]].copyright;
+      if ( this.BackgroundImgOneDiv == true) {
+        this.BackgroundImgTwoDivStyle =
+          "background-image:url('" + this.bingImgUrl + "');";
+        this.BackgroundImgOneDiv = false;
+      } else {
+        this.BackgroundImgOneDivStyle =
+          "background-image:url('" + this.bingImgUrl + "');";
+        this.BackgroundImgOneDiv = true;
+      }
+      this.contentStyle = "--bingImgUrl:url('" + this.bingImgUrl + "');";
     },
     getBingImgComputeIntervalClick() {
       this.getBingImgComputeInterval = setInterval(() => {
-        this.getBingImgCompute();
+        this.getBingImgCompute("auto");
       }, 30000);
     },
     changeBackgroundClick() {
-      this.getBingImgCompute();
+      this.getBingImgCompute("not auto");
       this.changeBackgroundCount = this.changeBackgroundCount + 1;
       clearInterval(this.getBingImgComputeInterval); //重置自动换背景图的定时器，防止手动换图后短时间内又被更换
       this.getBingImgComputeIntervalClick();
@@ -171,8 +213,9 @@ export default {
       // alert("手机端")
       this.contentClass = "contentiPhone";
       this.changeBackgroundButtonIPhoneOrNot = true;
+      this.BackgroundImgDescriptionShow = false;
     }
-    this.getBingImgCompute();
+    this.getBingImgCompute("not auto");
     this.getBingImgComputeIntervalClick();
     $(window).resize(() => {
       this.boxStyle =
@@ -180,10 +223,10 @@ export default {
         $(window).height() +
         "px;width:" +
         $(window).width() +
-        "px;background-image:url('" +
-        this.bingImgUrl +
-        "');";
+        "px;";
     });
+    this.boxStyle =
+      "height:" + $(window).height() + "px;width:" + $(window).width() + "px;";
     setInterval(() => {
       this.changeBackgroundCount = 0;
     }, 20000);
@@ -194,6 +237,7 @@ export default {
 html,
 body {
   overflow: hidden !important;
+  /*禁止滚动处理*/
 }
 /*模糊的背景*/
 .box {
@@ -342,5 +386,25 @@ body {
   left: -10px;
   bottom: -10px;
 }
+.BackgroundImgDescription {
+  position: absolute;
+  top: 10px;
+  right: 50px;
+  background-color: #909399;
+  border-radius: 4px;
+  padding: 4px;
+  z-index: 3;
+}
+.BackgroundImgDescription span {
+  font-size: 12px;
+  color: rgb(255, 255, 255);
+}
+.BackgroundImgDescription a {
+  color: rgb(226, 226, 226);
+  text-decoration: none;
+}
+.BackgroundImgDivClass {
+  width: 100%;
+  height: 100%;
+}
 </style>
-<!--全局禁止滚动处理，背景图加载动画（非手动更换背景不要加载动画），背景图更换动画，图片描述，下载本图片-->
