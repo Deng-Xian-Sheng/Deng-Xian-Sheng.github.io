@@ -1,7 +1,6 @@
 <meta http-equiv="refresh" content="0; url=https://deng-xian-sheng.github.io/pollinations-img-page/">
 
 # Deng-Xian-Sheng.github.io
-邓文怡 dengwenyi.com
 
 ## Project setup
 ```
